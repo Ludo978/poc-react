@@ -1,0 +1,15 @@
+.app{
+    display: flex;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    .main-content-card{
+        flex: 1;
+        margin:var(--large) var(--large) 0 var(--large);
+        border-radius: var(--xlarge) var(--xlarge) 0 0;
+        background: white;
+        padding: var(--xlarge);
+        overflow: auto;
+    }
+}

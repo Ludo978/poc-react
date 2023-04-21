@@ -1,26 +1,33 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { ThemeProvider, GlobalStyles } from '@mui/material';
+import { ApolloProvider } from '@apollo/client';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import theme from './styles/theme';
+import styles from './styles/global';
+import Routes from './routes';
+import client from './actions/setup';
+import Store from './context/store';
+import './app.scss';
+import Layout from './layouts/main';
 
-function App() {
+const inputGlobalStyles = <GlobalStyles styles={styles} />;
+
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ApolloProvider client={client}>
+      <Router>
+        <Store>
+          <Layout>
+            <ThemeProvider theme={theme}>
+              <Routes />
+              {inputGlobalStyles}
+              <ToastContainer />
+            </ThemeProvider>
+          </Layout>
+        </Store>
+      </Router>
+    </ApolloProvider>
   );
 }
-
-export default App;
