@@ -30,14 +30,23 @@ export default function CreateAccountModal({
   const [createAccount] = useMutation(createAccountMutation);
   const [updateAccount] = useMutation(updateAccountMutation);
 
+  const isEdit = !!initialValues.id;
+
   const [disableButtons, setDisableButtons] = useState(false);
 
-  const onSubmit = async (values) => {
-    console.log(values);
-    setDisableButtons(false);
+  const onSubmit = async (values: AccountDto) => {
+    setDisableButtons(true);
     try {
-      if (initialValues.id) {
-        await updateAccount({ variables: { account: values } });
+      if (isEdit) {
+        await updateAccount({
+          variables: {
+            account: {
+              id: initialValues.id,
+              firstname: values.firstname,
+              lastname: values.lastname,
+            },
+          },
+        });
         toast.success('Account updated');
       } else {
         await createAccount({ variables: { account: values } });
@@ -49,7 +58,7 @@ export default function CreateAccountModal({
       console.error(error);
       toast.error('An error occured');
     }
-    setDisableButtons(true);
+    setDisableButtons(false);
   };
 
   return (
@@ -65,7 +74,7 @@ export default function CreateAccountModal({
           handleChange,
         }) => (
           <>
-            <DialogContent>
+            <DialogContent style={{ paddingTop: 'var(--small)' }}>
               <Grid container spacing={2}>
                 <Grid item xs={6}>
                   <TextField
@@ -87,34 +96,41 @@ export default function CreateAccountModal({
                     onChange={handleChange}
                   />
                 </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    fullWidth
-                    label="Email"
-                    name="email"
-                    required
-                    value={values.email}
-                    onChange={handleChange}
-                    type="email"
-                  />
-                </Grid>
-                {!initialValues.id && (
-                <Grid item xs={6}>
-                  <TextField
-                    fullWidth
-                    label="Password"
-                    name="password"
-                    required
-                    value={values.password}
-                    onChange={handleChange}
-                    type="password"
-                  />
-                </Grid>
+                {!isEdit && (
+                <>
+                  <Grid item xs={6}>
+                    <TextField
+                      fullWidth
+                      label="Email"
+                      name="email"
+                      required
+                      value={values.email}
+                      onChange={handleChange}
+                      type="email"
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField
+                      fullWidth
+                      label="Password"
+                      name="password"
+                      required
+                      value={values.password}
+                      onChange={handleChange}
+                      type="password"
+                    />
+                  </Grid>
+                </>
                 )}
               </Grid>
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => handleSubmit()} disabled={disableButtons}>Create</Button>
+              <Button
+                onClick={() => handleSubmit()}
+                disabled={disableButtons}
+              >
+                {isEdit ? 'Update' : 'Create'}
+              </Button>
             </DialogActions>
           </>
         )}

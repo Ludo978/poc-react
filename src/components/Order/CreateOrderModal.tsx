@@ -31,14 +31,23 @@ export default function CreateOrderModal({
   const [createOrder] = useMutation(createOrderMutation);
   const [updateOrder] = useMutation(updateOrderMutation);
 
+  const isEdit = !!initialValues.id;
+
   const [disableButtons, setDisableButtons] = useState(false);
 
-  const onSubmit = async (values) => {
-    console.log(values);
-    setDisableButtons(false);
+  const onSubmit = async (values: OrderDto) => {
+    setDisableButtons(true);
     try {
-      if (initialValues.id) {
-        await updateOrder({ variables: { order: values } });
+      if (isEdit) {
+        await updateOrder({
+          variables: {
+            order: {
+              id: initialValues.id,
+              accountId: values.accountId,
+              productsId: values.productsId,
+            },
+          },
+        });
         toast.success('Order updated');
       } else {
         await createOrder({ variables: { order: values } });
@@ -50,7 +59,7 @@ export default function CreateOrderModal({
       console.error(error);
       toast.error('An error occured');
     }
-    setDisableButtons(true);
+    setDisableButtons(false);
   };
 
   return (
@@ -67,7 +76,7 @@ export default function CreateOrderModal({
           setFieldValue,
         }) => (
           <>
-            <DialogContent>
+            <DialogContent style={{ paddingTop: 'var(--small)' }}>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <TextField
@@ -75,7 +84,7 @@ export default function CreateOrderModal({
                     label="Account ID"
                     name="accountId"
                     required
-                    value={values.accountID}
+                    value={values.accountId}
                     onChange={handleChange}
                   />
                 </Grid>
@@ -99,7 +108,12 @@ export default function CreateOrderModal({
               </Grid>
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => handleSubmit()} disabled={disableButtons}>Create</Button>
+              <Button
+                onClick={() => handleSubmit()}
+                disabled={disableButtons}
+              >
+                {isEdit ? 'Update' : 'Create'}
+              </Button>
             </DialogActions>
           </>
         )}

@@ -30,14 +30,25 @@ export default function CreateProductModal({
   const [createProduct] = useMutation(createProductMutation);
   const [updateProduct] = useMutation(updateProductMutation);
 
+  const isEdit = !!initialValues.id;
+
   const [disableButtons, setDisableButtons] = useState(false);
 
-  const onSubmit = async (values) => {
-    console.log(values);
-    setDisableButtons(false);
+  const onSubmit = async (values: ProductDto) => {
+    setDisableButtons(true);
     try {
-      if (initialValues.id) {
-        await updateProduct({ variables: { product: values } });
+      if (isEdit) {
+        await updateProduct({
+          variables: {
+            product: {
+              id: initialValues.id,
+              name: values.name,
+              price: values.price,
+              image: values.image,
+              description: values.description,
+            },
+          },
+        });
         toast.success('Product updated');
       } else {
         await createProduct({ variables: { product: values } });
@@ -49,7 +60,7 @@ export default function CreateProductModal({
       console.error(error);
       toast.error('An error occured');
     }
-    setDisableButtons(true);
+    setDisableButtons(false);
   };
 
   return (
@@ -65,7 +76,7 @@ export default function CreateProductModal({
           handleChange,
         }) => (
           <>
-            <DialogContent>
+            <DialogContent style={{ paddingTop: 'var(--small)' }}>
               <Grid container spacing={2}>
                 <Grid item xs={6}>
                   <TextField
@@ -112,7 +123,12 @@ export default function CreateProductModal({
               </Grid>
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => handleSubmit()} disabled={disableButtons}>Create</Button>
+              <Button
+                onClick={() => handleSubmit()}
+                disabled={disableButtons}
+              >
+                {isEdit ? 'Update' : 'Create'}
+              </Button>
             </DialogActions>
           </>
         )}
